@@ -492,11 +492,341 @@ class TaxSavingTipsAI extends HTMLElement {
     }
 }
 
+class DetailedSalaryCalculator extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .form-group { margin-bottom: 0.75rem; }
+                label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+                input { width: 100%; padding: 0.5rem; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; }
+                button { background: #1d4ed8; color: white; border: 0; padding: 0.65rem 1rem; border-radius: 6px; cursor: pointer; }
+                #result { margin-top: 0.8rem; line-height: 1.5; }
+                .money { font-weight: 700; }
+            </style>
+            <div>
+                <div class="form-group"><label>세전 월급 (원)</label><input id="gross" type="number" placeholder="3000000"></div>
+                <div class="form-group"><label>국민연금률 (%)</label><input id="pension" type="number" value="4.5" step="0.01"></div>
+                <div class="form-group"><label>건강보험률 (%)</label><input id="health" type="number" value="3.545" step="0.001"></div>
+                <div class="form-group"><label>고용보험률 (%)</label><input id="employment" type="number" value="0.9" step="0.01"></div>
+                <div class="form-group"><label>소득세+지방세 추정률 (%)</label><input id="tax" type="number" value="3.0" step="0.1"></div>
+                <button id="run">세부 계산</button>
+                <div id="result"></div>
+            </div>
+        `;
+        this.shadowRoot.getElementById('run').addEventListener('click', () => this.calculate());
+    }
+    won(v) { return `${Math.round(v).toLocaleString()}원`; }
+    calculate() {
+        const gross = parseFloat(this.shadowRoot.getElementById('gross').value);
+        const pensionRate = parseFloat(this.shadowRoot.getElementById('pension').value) || 0;
+        const healthRate = parseFloat(this.shadowRoot.getElementById('health').value) || 0;
+        const employmentRate = parseFloat(this.shadowRoot.getElementById('employment').value) || 0;
+        const taxRate = parseFloat(this.shadowRoot.getElementById('tax').value) || 0;
+        const el = this.shadowRoot.getElementById('result');
+        if (!gross) { el.textContent = '세전 월급을 입력하세요.'; return; }
+        const pension = gross * pensionRate / 100;
+        const health = gross * healthRate / 100;
+        const employment = gross * employmentRate / 100;
+        const tax = gross * taxRate / 100;
+        const totalDeduction = pension + health + employment + tax;
+        const net = gross - totalDeduction;
+        el.innerHTML = `
+          <div class="money">국민연금: ${this.won(pension)}</div>
+          <div class="money">건강보험: ${this.won(health)}</div>
+          <div class="money">고용보험: ${this.won(employment)}</div>
+          <div class="money">소득세+지방세(추정): ${this.won(tax)}</div>
+          <div class="money">총 공제액: ${this.won(totalDeduction)}</div>
+          <div class="money">예상 실수령액: ${this.won(net)}</div>
+        `;
+    }
+}
+
+class MonthlyTakeHomeCalendar extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .form-group { margin-bottom: 0.75rem; }
+                label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+                input, select { width: 100%; padding: 0.5rem; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; }
+                button { background: #0f766e; color: white; border: 0; padding: 0.65rem 1rem; border-radius: 6px; cursor: pointer; }
+                table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.9rem; }
+                th, td { border: 1px solid #cbd5e1; padding: 6px; text-align: left; }
+            </style>
+            <div>
+                <div class="form-group"><label>기본 월 실수령액 (원)</label><input id="base" type="number" placeholder="2500000"></div>
+                <div class="form-group"><label>상여 지급 월</label><select id="bonusMonth">${Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}월</option>`).join('')}</select></div>
+                <div class="form-group"><label>상여 실수령액 (원)</label><input id="bonus" type="number" value="0"></div>
+                <div class="form-group"><label>월 무급휴가 일수</label><input id="unpaid" type="number" value="0"></div>
+                <div class="form-group"><label>월 추가 수당 (원)</label><input id="extra" type="number" value="0"></div>
+                <button id="run">12개월 계산</button>
+                <div id="result"></div>
+            </div>
+        `;
+        this.shadowRoot.getElementById('run').addEventListener('click', () => this.calculate());
+    }
+    calculate() {
+        const base = parseFloat(this.shadowRoot.getElementById('base').value);
+        const bonusMonth = parseInt(this.shadowRoot.getElementById('bonusMonth').value, 10);
+        const bonus = parseFloat(this.shadowRoot.getElementById('bonus').value) || 0;
+        const unpaid = parseFloat(this.shadowRoot.getElementById('unpaid').value) || 0;
+        const extra = parseFloat(this.shadowRoot.getElementById('extra').value) || 0;
+        const el = this.shadowRoot.getElementById('result');
+        if (!base) { el.textContent = '기본 월 실수령액을 입력하세요.'; return; }
+        const daily = base / 30;
+        let rows = '';
+        let total = 0;
+        for (let m = 1; m <= 12; m++) {
+            let value = base - (daily * unpaid) + extra + (m === bonusMonth ? bonus : 0);
+            total += value;
+            rows += `<tr><td>${m}월</td><td>${Math.round(value).toLocaleString()}원</td></tr>`;
+        }
+        el.innerHTML = `<table><thead><tr><th>월</th><th>예상 실수령</th></tr></thead><tbody>${rows}</tbody></table><div style="margin-top:8px;font-weight:700;">연 합계: ${Math.round(total).toLocaleString()}원</div>`;
+    }
+}
+
+class JobOfferComparator extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+                .form-group { margin-bottom: 0.7rem; }
+                label { display: block; margin-bottom: 0.25rem; font-weight: 600; }
+                input { width: 100%; padding: 0.5rem; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; }
+                button { background: #7c3aed; color: white; border: 0; padding: 0.65rem 1rem; border-radius: 6px; cursor: pointer; }
+            </style>
+            <div>
+              <div class="grid">
+                <div>
+                  <div class="form-group"><label>A 연봉</label><input id="aAnnual" type="number" placeholder="50000000"></div>
+                  <div class="form-group"><label>A 월 복리 (식대/교통)</label><input id="aBenefit" type="number" value="0"></div>
+                </div>
+                <div>
+                  <div class="form-group"><label>B 연봉</label><input id="bAnnual" type="number" placeholder="55000000"></div>
+                  <div class="form-group"><label>B 월 복리 (식대/교통)</label><input id="bBenefit" type="number" value="0"></div>
+                </div>
+              </div>
+              <button id="run">비교</button>
+              <div id="result" style="margin-top:8px;"></div>
+            </div>
+        `;
+        this.shadowRoot.getElementById('run').addEventListener('click', () => this.calculate());
+    }
+    calculate() {
+        const aAnnual = parseFloat(this.shadowRoot.getElementById('aAnnual').value);
+        const aBenefit = parseFloat(this.shadowRoot.getElementById('aBenefit').value) || 0;
+        const bAnnual = parseFloat(this.shadowRoot.getElementById('bAnnual').value);
+        const bBenefit = parseFloat(this.shadowRoot.getElementById('bBenefit').value) || 0;
+        const el = this.shadowRoot.getElementById('result');
+        if (!aAnnual || !bAnnual) { el.textContent = 'A/B 연봉을 입력하세요.'; return; }
+        const aNet = (aAnnual * 0.88) + (aBenefit * 12);
+        const bNet = (bAnnual * 0.88) + (bBenefit * 12);
+        const diff = bNet - aNet;
+        el.innerHTML = `
+          <div><strong>A 연 실수령 추정:</strong> ${Math.round(aNet).toLocaleString()}원</div>
+          <div><strong>B 연 실수령 추정:</strong> ${Math.round(bNet).toLocaleString()}원</div>
+          <div><strong>차이(B-A):</strong> ${Math.round(diff).toLocaleString()}원</div>
+        `;
+    }
+}
+
+class ExitPackageCalculator extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .form-group { margin-bottom: 0.75rem; }
+                label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+                input { width: 100%; padding: 0.5rem; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; }
+                button { background: #b45309; color: white; border: 0; padding: 0.65rem 1rem; border-radius: 6px; cursor: pointer; }
+            </style>
+            <div>
+              <div class="form-group"><label>최근 3개월 급여 총액 (원)</label><input id="sum3m" type="number" placeholder="9000000"></div>
+              <div class="form-group"><label>총 재직일수</label><input id="days" type="number" placeholder="730"></div>
+              <div class="form-group"><label>미사용 연차 일수</label><input id="leaveDays" type="number" value="0"></div>
+              <button id="run">통합 계산</button>
+              <div id="result" style="margin-top:8px;"></div>
+            </div>
+        `;
+        this.shadowRoot.getElementById('run').addEventListener('click', () => this.calculate());
+    }
+    calculate() {
+        const sum3m = parseFloat(this.shadowRoot.getElementById('sum3m').value);
+        const days = parseFloat(this.shadowRoot.getElementById('days').value);
+        const leaveDays = parseFloat(this.shadowRoot.getElementById('leaveDays').value) || 0;
+        const el = this.shadowRoot.getElementById('result');
+        if (!sum3m || !days) { el.textContent = '최근 3개월 급여 총액과 재직일수를 입력하세요.'; return; }
+        const daily = sum3m / 90;
+        const severance = daily * 30 * (days / 365);
+        const leavePay = daily * leaveDays;
+        const total = severance + leavePay;
+        el.innerHTML = `
+          <div><strong>퇴직금 추정:</strong> ${Math.round(severance).toLocaleString()}원</div>
+          <div><strong>연차수당 추정:</strong> ${Math.round(leavePay).toLocaleString()}원</div>
+          <div><strong>퇴사 시 총 수령 추정:</strong> ${Math.round(total).toLocaleString()}원</div>
+        `;
+    }
+}
+
+class RefinanceComparator extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .form-group { margin-bottom: 0.75rem; }
+                label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+                input { width: 100%; padding: 0.5rem; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; }
+                button { background: #0f766e; color: white; border: 0; padding: 0.65rem 1rem; border-radius: 6px; cursor: pointer; }
+            </style>
+            <div>
+              <div class="form-group"><label>잔여 원금 (원)</label><input id="principal" type="number" placeholder="200000000"></div>
+              <div class="form-group"><label>기존 금리 (%)</label><input id="oldRate" type="number" placeholder="5.2"></div>
+              <div class="form-group"><label>대환 금리 (%)</label><input id="newRate" type="number" placeholder="3.9"></div>
+              <div class="form-group"><label>잔여 기간 (개월)</label><input id="months" type="number" placeholder="240"></div>
+              <div class="form-group"><label>중도상환수수료율 (%)</label><input id="feeRate" type="number" value="1.0"></div>
+              <button id="run">대환 비교</button>
+              <div id="result" style="margin-top:8px;"></div>
+            </div>
+        `;
+        this.shadowRoot.getElementById('run').addEventListener('click', () => this.calculate());
+    }
+    totalInterest(principal, annualRate, months) {
+        const r = annualRate / 100 / 12;
+        if (r === 0) return 0;
+        const pow = Math.pow(1 + r, months);
+        const payment = principal * r * pow / (pow - 1);
+        return (payment * months) - principal;
+    }
+    calculate() {
+        const principal = parseFloat(this.shadowRoot.getElementById('principal').value);
+        const oldRate = parseFloat(this.shadowRoot.getElementById('oldRate').value);
+        const newRate = parseFloat(this.shadowRoot.getElementById('newRate').value);
+        const months = parseInt(this.shadowRoot.getElementById('months').value, 10);
+        const feeRate = parseFloat(this.shadowRoot.getElementById('feeRate').value) || 0;
+        const el = this.shadowRoot.getElementById('result');
+        if (!principal || !months) { el.textContent = '잔여 원금과 기간을 입력하세요.'; return; }
+        const oldInt = this.totalInterest(principal, oldRate, months);
+        const newInt = this.totalInterest(principal, newRate, months);
+        const fee = principal * feeRate / 100;
+        const saving = oldInt - newInt - fee;
+        el.innerHTML = `
+          <div><strong>기존 총이자:</strong> ${Math.round(oldInt).toLocaleString()}원</div>
+          <div><strong>대환 총이자:</strong> ${Math.round(newInt).toLocaleString()}원</div>
+          <div><strong>중도상환수수료:</strong> ${Math.round(fee).toLocaleString()}원</div>
+          <div><strong>대환 순효과:</strong> ${Math.round(saving).toLocaleString()}원</div>
+        `;
+    }
+}
+
+class TaxChecklistManager extends HTMLElement {
+    constructor() {
+        super();
+        this.key = 'tax_checklist_v1';
+        this.items = ['연금계좌 납입 확인', '보장성 보험료 증빙 확인', '카드 사용내역 누락 점검', '의료비/교육비 공제 대상 확인', '부양가족 공제 요건 확인', '회사 제출 기한 체크'];
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .item { margin: 6px 0; display: flex; gap: 8px; align-items: center; }
+                button { margin-top: 8px; background: #475569; color: white; border: 0; padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer; }
+            </style>
+            <div>
+              <div id="list"></div>
+              <button id="reset">체크 초기화</button>
+            </div>
+        `;
+        this.render();
+        this.shadowRoot.getElementById('reset').addEventListener('click', () => {
+            localStorage.removeItem(this.key);
+            this.render();
+        });
+    }
+    render() {
+        const saved = JSON.parse(localStorage.getItem(this.key) || '[]');
+        const list = this.shadowRoot.getElementById('list');
+        list.innerHTML = this.items.map((item, idx) => `<label class="item"><input type="checkbox" data-idx="${idx}" ${saved[idx] ? 'checked' : ''}> ${item}</label>`).join('');
+        list.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+            box.addEventListener('change', () => {
+                const next = Array.from(list.querySelectorAll('input[type="checkbox"]')).map((el) => el.checked);
+                localStorage.setItem(this.key, JSON.stringify(next));
+            });
+        });
+    }
+}
+
+class ResultExportTool extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                textarea { width: 100%; min-height: 120px; box-sizing: border-box; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; }
+                .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+                button { background: #1e40af; color: white; border: 0; padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer; }
+            </style>
+            <div>
+              <textarea id="text" placeholder="저장할 계산 결과/메모를 입력하세요."></textarea>
+              <div class="actions">
+                <button id="download">TXT 저장</button>
+                <button id="copy">복사</button>
+              </div>
+            </div>
+        `;
+        this.shadowRoot.getElementById('download').addEventListener('click', () => this.download());
+        this.shadowRoot.getElementById('copy').addEventListener('click', () => this.copy());
+    }
+    download() {
+        const text = this.shadowRoot.getElementById('text').value || '저장할 내용이 없습니다.';
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'salary-calculation-result.txt';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+    async copy() {
+        const text = this.shadowRoot.getElementById('text').value;
+        if (!text) return;
+        try { await navigator.clipboard.writeText(text); } catch (_) {}
+    }
+}
+
+class RegulationUpdateBanner extends HTMLElement {
+    constructor() {
+        super();
+        this.key = 'regulation_banner_hidden';
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                .banner { border: 1px solid #fde68a; background: #fffbeb; color: #7c2d12; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+                button { background: #b45309; color: white; border: 0; padding: 0.35rem 0.6rem; border-radius: 6px; cursor: pointer; }
+            </style>
+            <div id="wrap"></div>
+        `;
+        this.render();
+    }
+    render() {
+        const wrap = this.shadowRoot.getElementById('wrap');
+        if (localStorage.getItem(this.key) === '1') { wrap.innerHTML = ''; return; }
+        wrap.innerHTML = `<div class="banner"><span>최저시급·4대보험·세율은 매년 변경될 수 있습니다. 최신 요율을 확인하고 계산값을 갱신하세요.</span><button id="hide">닫기</button></div>`;
+        this.shadowRoot.getElementById('hide').addEventListener('click', () => {
+            localStorage.setItem(this.key, '1');
+            this.render();
+        });
+    }
+}
+
 
 customElements.define('part-time-pay-calculator', PartTimePayCalculator);
 customElements.define('salary-raise-simulator', SalaryRaiseSimulator);
 customElements.define('loan-repayment-calculator', LoanRepaymentCalculator);
 customElements.define('tax-saving-tips-ai', TaxSavingTipsAI);
+customElements.define('detailed-salary-calculator', DetailedSalaryCalculator);
+customElements.define('monthly-takehome-calendar', MonthlyTakeHomeCalendar);
+customElements.define('job-offer-comparator', JobOfferComparator);
+customElements.define('exit-package-calculator', ExitPackageCalculator);
+customElements.define('refinance-comparator', RefinanceComparator);
+customElements.define('tax-checklist-manager', TaxChecklistManager);
+customElements.define('result-export-tool', ResultExportTool);
+customElements.define('regulation-update-banner', RegulationUpdateBanner);
 customElements.define('after-tax-calculator', AfterTaxCalculator);
 customElements.define('annual-salary-calculator', AnnualSalaryCalculator);
 customElements.define('severance-pay-calculator', SeverancePayCalculator);

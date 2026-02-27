@@ -134,6 +134,19 @@ section {
   background: var(--card);
 }
 
+.tool-box {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  background: var(--card);
+}
+
+.tool-box summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
 ul,
 ol {
   margin: 10px 0 0;
@@ -184,7 +197,15 @@ loan-repayment-calculator,
 tax-saving-tips-ai,
 annual-salary-calculator,
 severance-pay-calculator,
-loan-interest-calculator {
+loan-interest-calculator,
+detailed-salary-calculator,
+monthly-takehome-calendar,
+job-offer-comparator,
+exit-package-calculator,
+refinance-comparator,
+tax-checklist-manager,
+result-export-tool,
+regulation-update-banner {
   display: block;
   margin-top: 10px;
 }
