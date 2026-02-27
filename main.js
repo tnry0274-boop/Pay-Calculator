@@ -91,15 +91,22 @@ class AfterTaxCalculator extends HTMLElement {
                 h2 { color: #4a90e2; }
                 .form-group { margin-bottom: 1rem; }
                 label { display: block; margin-bottom: 0.5rem; }
-                input { width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+                input, select { width: 100%; box-sizing: border-box; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
                 button { background-color: #4a90e2; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
                 #result { margin-top: 1rem; font-weight: bold; }
             </style>
             <div>
-                <h2>월급 세후 계산기</h2>
+                <h2>월급·연봉 통합 계산기</h2>
                 <div class="form-group">
-                    <label for="monthly-salary">월급 (세전)</label>
-                    <input type="number" id="monthly-salary" placeholder="3000000">
+                    <label for="salary-mode">입력 기준</label>
+                    <select id="salary-mode">
+                        <option value="monthly">월급(세전)</option>
+                        <option value="annual">연봉(세전)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="salary-amount">금액 (원)</label>
+                    <input type="number" id="salary-amount" placeholder="3000000">
                 </div>
                 <button>계산</button>
                 <div id="result"></div>
@@ -109,12 +116,13 @@ class AfterTaxCalculator extends HTMLElement {
     }
 
     calculate() {
-        const salary = parseFloat(this.shadowRoot.querySelector('#monthly-salary').value);
+        const amount = parseFloat(this.shadowRoot.querySelector('#salary-amount').value);
+        const mode = this.shadowRoot.querySelector('#salary-mode').value;
         const resultEl = this.shadowRoot.querySelector('#result');
-        if (!salary) { resultEl.textContent = '월급을 입력하세요.'; return; }
-        const monthlyGross = salary;
-        const monthlyNet = salary * 0.9;
-        const annualGross = monthlyGross * 12;
+        if (!amount) { resultEl.textContent = '금액을 입력하세요.'; return; }
+        const monthlyGross = mode === 'monthly' ? amount : amount / 12;
+        const annualGross = mode === 'monthly' ? amount * 12 : amount;
+        const monthlyNet = monthlyGross * 0.9;
         const annualNet = monthlyNet * 12;
         resultEl.innerHTML = `
             <div>세전 월급: ${monthlyGross.toLocaleString()}원</div>
