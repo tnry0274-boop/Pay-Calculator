@@ -399,13 +399,14 @@ class TaxSavingTipsAI extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' }).innerHTML = `
             <style>
+                :host { color: #0f172a; }
                 h2 { color: #2563eb; }
                 .form-group { margin-bottom: 1rem; }
                 label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
                 input { width: 100%; box-sizing: border-box; padding: 0.55rem; border: 1px solid #ccc; border-radius: 4px; }
                 button { background-color: #2563eb; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
                 #result { margin-top: 1rem; line-height: 1.55; }
-                .tip { border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 8px; padding: 10px; margin-top: 8px; }
+                .tip { border: 1px solid #bfdbfe; background: #eff6ff; color: #1e293b; border-radius: 8px; padding: 10px; margin-top: 8px; }
                 .title { font-weight: 700; margin-bottom: 4px; }
                 .small { color: #64748b; font-size: 0.9rem; margin-top: 0.75rem; }
             </style>
