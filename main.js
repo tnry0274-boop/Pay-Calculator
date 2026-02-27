@@ -109,10 +109,19 @@ class AfterTaxCalculator extends HTMLElement {
     }
 
     calculate() {
-        const salary = this.shadowRoot.querySelector('#monthly-salary').value;
+        const salary = parseFloat(this.shadowRoot.querySelector('#monthly-salary').value);
         const resultEl = this.shadowRoot.querySelector('#result');
         if (!salary) { resultEl.textContent = '월급을 입력하세요.'; return; }
-        resultEl.textContent = `세후 월급: ${(salary * 0.9).toLocaleString()}원 (간이세액 기준)`;
+        const monthlyGross = salary;
+        const monthlyNet = salary * 0.9;
+        const annualGross = monthlyGross * 12;
+        const annualNet = monthlyNet * 12;
+        resultEl.innerHTML = `
+            <div>세전 월급: ${monthlyGross.toLocaleString()}원</div>
+            <div>세후 월급: ${Math.round(monthlyNet).toLocaleString()}원</div>
+            <div>세전 연봉: ${annualGross.toLocaleString()}원</div>
+            <div>세후 연봉: ${Math.round(annualNet).toLocaleString()}원</div>
+        `;
     }
 }
 
@@ -142,10 +151,19 @@ class AnnualSalaryCalculator extends HTMLElement {
     }
 
     calculate() {
-        const salary = this.shadowRoot.querySelector('#annual-salary').value;
+        const salary = parseFloat(this.shadowRoot.querySelector('#annual-salary').value);
         const resultEl = this.shadowRoot.querySelector('#result');
         if (!salary) { resultEl.textContent = '연봉을 입력하세요.'; return; }
-        resultEl.textContent = `세후 연봉: ${(salary * 0.88).toLocaleString()}원 (근사치)`;
+        const annualGross = salary;
+        const annualNet = salary * 0.88;
+        const monthlyGross = annualGross / 12;
+        const monthlyNet = annualNet / 12;
+        resultEl.innerHTML = `
+            <div>세전 연봉: ${annualGross.toLocaleString()}원</div>
+            <div>세후 연봉: ${Math.round(annualNet).toLocaleString()}원</div>
+            <div>세전 월급: ${Math.round(monthlyGross).toLocaleString()}원</div>
+            <div>세후 월급: ${Math.round(monthlyNet).toLocaleString()}원</div>
+        `;
     }
 }
 
