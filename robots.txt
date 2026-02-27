@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tnry0274-boop.github.io/Pay-Calculator/sitemap.xml

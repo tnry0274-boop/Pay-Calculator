@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>급여 계산기 허브 | 실수령액, 연봉, 퇴직금, 대출이자 계산 가이드</title>
-  <meta name="description" content="실수령액 계산, 연봉 환산, 퇴직금 추정, 대출이자 확인까지 한 번에. 계산 공식 설명, 해석 가이드, 자주 묻는 질문, 개인정보 처리 원칙을 제공하는 급여 계산 정보 사이트입니다." />
-  <meta name="keywords" content="실수령액 계산기, 연봉 계산기, 퇴직금 계산기, 대출이자 계산기, 세후 급여, 월급 계산, 급여 가이드" />
+  <title>급여계산기 | 실수령 계산기, 알바 월급·주휴수당·연봉 계산</title>
+  <meta name="description" content="급여계산기와 실수령 계산기를 한 번에. 알바 일급·주급·월급·연봉, 주휴수당, 시간외수당, 세후 월급, 퇴직금, 대출이자를 빠르게 계산하는 한국어 급여 계산 사이트." />
+  <meta name="keywords" content="급여계산기, 실수령 계산기, 실수령액 계산기, 알바 계산기, 주휴수당 계산기, 시간외수당 계산기, 세후 월급 계산기, 연봉 계산기, 퇴직금 계산기" />
   <meta name="robots" content="index,follow" />
   <meta name="author" content="Pay Calculator Lab" />
   <meta name="google-adsense-account" content="ca-pub-1847702816965718" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="급여 계산기 허브" />
-  <meta property="og:description" content="실수령액, 연봉, 퇴직금, 대출이자 계산을 정확히 이해하기 위한 실전 가이드" />
+  <meta property="og:title" content="급여계산기 | 실수령 계산기" />
+  <meta property="og:description" content="알바 급여, 주휴수당, 시간외수당, 실수령액, 연봉, 퇴직금 계산을 한 번에 제공하는 급여계산기 사이트" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:url" content="https://tnry0274-boop.github.io/Pay-Calculator/" />
   <link rel="canonical" href="https://tnry0274-boop.github.io/Pay-Calculator/" />
@@ -21,22 +21,53 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "급여 계산기 허브",
+      "name": "급여계산기랩",
       "url": "https://tnry0274-boop.github.io/Pay-Calculator/",
-      "description": "급여 및 금융 계산기를 통해 월 실수령액, 연봉, 퇴직금, 이자 비용을 계산하고 해석 방법을 제공하는 정보형 웹사이트"
+      "description": "급여계산기와 실수령 계산기를 제공하며 알바 급여, 주휴수당, 시간외수당, 연봉, 퇴직금 계산을 지원하는 한국어 웹사이트"
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "실수령 계산기 결과와 실제 급여가 다른 이유는 무엇인가요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "회사별 공제 규정, 비과세 수당, 중도 입퇴사 정산 방식, 소수점 처리 기준 차이로 결과가 달라질 수 있습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "알바 주휴수당은 언제 발생하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "통상적으로 주 소정근로시간 15시간 이상 근무 등 요건을 충족하면 주휴수당이 발생할 수 있습니다."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "월급 계산에서 시간외수당은 어떻게 반영하나요?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "사이트의 알바 급여 계산기에서 주 시간외근무 시간을 입력하면 1.5배 가산 기준으로 시간외수당을 계산합니다."
+          }
+        }
+      ]
     }
   </script>
 </head>
 <body>
   <header class="container">
     <div class="header-top">
-      <h1>급여 계산기 허브</h1>
+      <h1>급여계산기랩</h1>
       <button id="theme-toggle" type="button" aria-label="테마 전환">다크모드</button>
     </div>
     <p class="lead">
-      이 사이트는 월 실수령액, 연봉 환산, 퇴직금, 대출이자 계산을 한 곳에서 제공하며,
-      결과를 해석하는 방법까지 설명하는 정보형 페이지입니다. 숫자만 확인하는 계산기가 아니라
-      왜 이런 결과가 나왔는지 이해할 수 있도록 계산 원리와 실무 팁을 함께 담았습니다.
+      급여계산기랩은 ‘급여계산기’, ‘실수령 계산기’ 검색 사용자를 위해 만든 한국어 계산 플랫폼입니다.
+      알바 일급·주급·월급·연봉, 주휴수당, 시간외수당, 세후 월급, 퇴직금까지 핵심 항목을 한 페이지에서 계산할 수 있습니다.
     </p>
     <nav aria-label="바로가기">
       <a href="#calculators">계산기</a>
