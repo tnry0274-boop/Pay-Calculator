@@ -1,67 +1,72 @@
-# **Project Blueprint: Financial Calculators**
+# **Project Blueprint: Financial Intelligence Hub**
 
 ## **1. Overview**
 
-This project is a web application that provides a collection of essential financial calculators for everyday use. The goal is to create a user-friendly, intuitive, and visually appealing interface that makes complex financial calculations simple and accessible to everyone. The application will be a single-page interface featuring four distinct calculators:
+This project is evolving from a simple calculator tool into a comprehensive **Financial Intelligence Hub**. The primary goal is to create a high-value, content-rich web application that not only provides essential financial calculators but also educates users on related financial topics. This will establish the site as a trustworthy resource, significantly improving its chances of **Google AdSense approval**.
 
-1.  **After-Tax Salary Calculator**
-2.  **Annual Salary Calculator**
-3.  **Severance Pay Calculator**
-4.  **Loan Interest Calculator**
+### **Core Components:**
+1.  **Financial Calculators:**
+    *   After-Tax Salary Calculator
+    *   Annual Salary Calculator
+    *   Severance Pay Calculator
+    *   Loan Interest Calculator
+2.  **In-Depth Articles & Guides:**
+    *   Detailed explanations for each calculator.
+    *   Informational articles on relevant financial topics.
+3.  **Enhanced User Experience:**
+    *   A professional, clean, and content-focused design.
 
-The application will be built using modern web standards (HTML, CSS, JavaScript) without any external frameworks, leveraging Web Components for modular and maintainable UI elements.
+## **2. Content & SEO Strategy (AdSense Focus)**
 
-## **2. Core Features & Design**
+### **A. Content is King**
 
-### **A. Application Structure**
+The key to AdSense approval is providing unique, valuable, and engaging content.
 
-*   **Single-Page Application (SPA):** All calculators will be accessible from a single `index.html` page.
-*   **Web Components:** Each calculator will be a self-contained Web Component (`<after-tax-calculator>`, `<annual-salary-calculator>`, etc.) to encapsulate its HTML, CSS, and JavaScript. This promotes reusability and separation of concerns.
-*   **Modular JavaScript:** Code will be organized into ES Modules for clarity and maintainability.
-*   **Responsive Design:** The layout will be fully responsive, ensuring a seamless experience on both desktop and mobile devices using modern CSS like flexbox and grid.
+1.  **Calculator Detail Pages:**
+    *   Instead of just having the tool, each calculator will be framed by a detailed article explaining:
+        *   **What it is:** The purpose of the calculation (e.g., "What is severance pay and who is eligible?").
+        *   **How it works:** A breakdown of the formula used, including relevant tax laws and regulations (e.g., "Understanding the 4 Major Public Insurances in Korea").
+        *   **What to do next:** Practical advice based on the result (e.g., "How to Negotiate a Higher Salary," "Smart Ways to Manage Your Loan").
 
-### **B. Visual Design & Aesthetics**
+2.  **Supporting Informational Articles:**
+    *   A dedicated "Financial Guides" section will feature articles on broader topics. Initial topics will include:
+        *   "A Beginner's Guide to Saving and Investing in Your 20s"
+        *   "Understanding Compound Interest: The Eighth Wonder of the World"
+        *   "How to Create a Personal Budget That Actually Works"
+        *   "Navigating Year-End Tax Settlements in Korea"
 
-*   **Theme:** Modern, clean, and bold.
-*   **Color Palette:** A vibrant and energetic palette will be used to create a positive user experience.
-*   **Typography:** Expressive and hierarchical fonts will be used to guide the user's attention and improve readability.
-*   **Iconography:** Icons will be used to visually represent each calculator, enhancing usability and navigation.
-*   **Interactivity:** Interactive elements like buttons and input fields will have subtle "glow" effects and shadows to provide a sense of depth and responsiveness.
-*   **Layout:** A card-based layout will be used, with each calculator housed in its own "lifted" card with soft drop shadows. The background will have a subtle noise texture for a premium feel.
+### **B. SEO (Search Engine Optimization)**
 
-### **C. Accessibility (A11Y)**
+*   **Meta Tags:** Each page/section will have unique and descriptive `<title>` and `<meta name="description">` tags.
+*   **Semantic HTML:** Proper use of heading tags (`<h1>`, `<h2>`, `<h3>`), paragraphs (`<p>`), lists (`<ul>`, `<ol>`), and `<strong>` for emphasis.
+*   **Keyword Strategy:** Naturally integrate relevant keywords (e.g., "세후 월급", "연봉 실수령액", "퇴직금 계산법") throughout the articles.
 
-*   The application will adhere to a11y standards.
-*   Proper semantic HTML (`<label>`, `<input>`, `<button>`) will be used.
-*   ARIA attributes will be added where necessary.
-*   Color contrast will be sufficient for readability.
-*   All functionality will be accessible via the keyboard.
+## **3. Design & Layout Enhancement**
 
-## **3. Implementation Plan**
+*   **Layout Change:** Move from a grid of calculators to a more content-centric layout. A main content area will feature the articles, with calculators embedded within or linked from them.
+*   **Navigation:** A clear navigation bar will be added to the header, allowing users to easily switch between calculators and the financial guides section.
+*   **Readability:** Typography will be optimized for long-form reading.
 
-This outlines the steps for the initial development of the calculator application.
+## **4. Implementation Plan**
 
-1.  **Setup `index.html`:**
-    *   Set the main page title.
-    *   Create a main container for the application.
-    *   Add a header with the application title.
-    *   Add placeholder custom element tags for each of the four calculators.
-    *   Link to `style.css` and `main.js`.
+1.  **Update `index.html` Structure:**
+    *   Add a navigation bar (`<nav>`).
+    *   Create a main content area to hold articles.
+    *   Structure each calculator section as an `<article>` with headings, paragraphs, and the calculator component itself.
+    *   Add a separate section for the "Financial Guides."
 
-2.  **Develop `style.css`:**
-    *   Define CSS variables for the color palette, fonts, and spacing.
-    *   Apply global styles (e.g., `box-sizing`, body background, font).
-    *   Create the main layout using Grid or Flexbox to arrange the calculator cards.
-    *   Style the "card" component that will be used by each calculator.
-    *   Add responsive styles using media queries.
+2.  **Update `style.css`:**
+    *   Style the new navigation bar.
+    *   Style the article layouts, ensuring clear separation between text and calculators.
+    *   Ensure everything remains responsive.
 
-3.  **Implement `main.js` (Web Components):**
-    *   For each calculator, create a JavaScript class that extends `HTMLElement`.
-    *   Inside each class:
-        *   Attach a Shadow DOM to encapsulate the component's style and structure.
-        *   Use an HTML `<template>` to define the component's internal HTML (input fields, labels, button, result area).
-        *   Define the component's specific styles within the Shadow DOM.
-        *   Implement the calculation logic as a method within the class.
-        *   Add event listeners to the inputs and button to trigger the calculation.
-        *   Update the result area when the calculation is complete.
-    *   Use `customElements.define()` to register each of the four calculator components.
+3.  **Refine `main.js`:**
+    *   Review and enhance calculator logic for greater accuracy, adding comments to explain the formulas.
+    *   (No major structural changes needed for the JS components themselves).
+
+4.  **Content Writing:**
+    *   Draft and add the detailed text content for each calculator page and the supporting articles directly into `index.html`.
+
+5.  **Deployment:**
+    *   Commit all changes to the GitHub repository.
+    *   Configure GitHub Pages to serve the site live from the `main` branch.
