@@ -1,10 +1,25 @@
 :root {
+  color-scheme: light;
   --bg: #f7f9fc;
+  --header-bg: #ffffff;
   --card: #ffffff;
   --text: #1b2530;
   --muted: #4d5f73;
   --line: #d8e0ea;
   --accent: #0d6efd;
+  --accent-soft: #eaf2ff;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111827;
+  --header-bg: #0f172a;
+  --card: #1f2937;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --line: #334155;
+  --accent: #60a5fa;
+  --accent-soft: #1e293b;
 }
 
 * {
@@ -15,8 +30,9 @@ body {
   margin: 0;
   font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
   color: var(--text);
-  background: linear-gradient(180deg, #edf3ff 0%, var(--bg) 280px);
+  background: linear-gradient(180deg, var(--header-bg) 0%, var(--bg) 280px);
   line-height: 1.65;
+  font-size: 17px;
 }
 
 .container {
@@ -26,6 +42,13 @@ body {
 
 header {
   padding: 44px 0 24px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
 }
 
 h1,
@@ -45,8 +68,18 @@ h2 {
 
 .lead {
   color: var(--muted);
-  max-width: 780px;
+  max-width: 860px;
   margin: 0;
+}
+
+#theme-toggle {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 9px 14px;
+  cursor: pointer;
 }
 
 nav {
@@ -59,8 +92,8 @@ nav {
 nav a {
   text-decoration: none;
   color: var(--accent);
-  border: 1px solid #bfd4ff;
-  background: #eef4ff;
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
   padding: 7px 12px;
   border-radius: 999px;
   font-weight: 600;
@@ -69,6 +102,7 @@ nav a {
 
 main {
   padding-bottom: 50px;
+  max-width: 930px;
 }
 
 section {
@@ -89,15 +123,15 @@ section {
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 14px;
-  background: #fdfefe;
+  background: var(--card);
 }
 
 .calc-article {
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 16px;
+  padding: 18px;
   margin-top: 12px;
-  background: #fcfdff;
+  background: var(--card);
 }
 
 ul,
@@ -122,7 +156,7 @@ td {
 }
 
 th {
-  background: #f3f7ff;
+  background: var(--accent-soft);
 }
 
 .small {
@@ -154,10 +188,16 @@ loan-interest-calculator {
 @media (max-width: 700px) {
   body {
     background: var(--bg);
+    font-size: 16px;
   }
 
   header {
     padding-top: 30px;
+  }
+
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   section {

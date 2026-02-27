@@ -27,7 +27,10 @@
 </head>
 <body>
   <header class="container">
-    <h1>급여 계산기 허브</h1>
+    <div class="header-top">
+      <h1>급여 계산기 허브</h1>
+      <button id="theme-toggle" type="button" aria-label="테마 전환">다크모드</button>
+    </div>
     <p class="lead">
       이 사이트는 월 실수령액, 연봉 환산, 퇴직금, 대출이자 계산을 한 곳에서 제공하며,
       결과를 해석하는 방법까지 설명하는 정보형 페이지입니다. 숫자만 확인하는 계산기가 아니라
@@ -44,31 +47,8 @@
   </header>
 
   <main class="container">
-    <section id="intro">
-      <h2>사이트 소개</h2>
-      <p>
-        급여와 금융 계산은 단순해 보이지만, 실제로는 세금 공제, 보험료, 근속기간, 금리 방식(단리/복리),
-        상환 조건 같은 변수에 따라 결과가 크게 달라집니다. 이 페이지는 계산 도구 제공뿐 아니라
-        각 항목의 의미를 설명해 잘못된 해석으로 인한 의사결정 오류를 줄이는 것을 목표로 합니다.
-      </p>
-      <div class="grid">
-        <article class="card">
-          <h3>정확성 우선</h3>
-          <p class="small">공식 기반 계산 로직을 사용하고, 입력값 의미를 명확히 제시합니다.</p>
-        </article>
-        <article class="card">
-          <h3>이해 중심</h3>
-          <p class="small">결과 숫자와 함께 실제 생활에서의 해석 방법을 안내합니다.</p>
-        </article>
-        <article class="card">
-          <h3>실무 친화</h3>
-          <p class="small">협상, 이직, 대출, 퇴사 시점 검토 등 실제 시나리오에 맞게 설명합니다.</p>
-        </article>
-      </div>
-    </section>
-
     <section id="calculators">
-      <h2>계산기 상세 안내</h2>
+      <h2>핵심 계산기</h2>
       <p class="small">각 계산기는 단순 결과값 제공이 아니라, 계산 기준과 해석 포인트를 함께 제공합니다.</p>
 
       <article class="calc-article">
@@ -106,6 +86,29 @@
         </p>
         <loan-interest-calculator></loan-interest-calculator>
       </article>
+    </section>
+
+    <section id="intro">
+      <h2>사이트 소개</h2>
+      <p>
+        급여와 금융 계산은 단순해 보이지만, 실제로는 세금 공제, 보험료, 근속기간, 금리 방식(단리/복리),
+        상환 조건 같은 변수에 따라 결과가 크게 달라집니다. 이 페이지는 계산 도구 제공뿐 아니라
+        각 항목의 의미를 설명해 잘못된 해석으로 인한 의사결정 오류를 줄이는 것을 목표로 합니다.
+      </p>
+      <div class="grid">
+        <article class="card">
+          <h3>정확성 우선</h3>
+          <p class="small">공식 기반 계산 로직을 사용하고, 입력값 의미를 명확히 제시합니다.</p>
+        </article>
+        <article class="card">
+          <h3>이해 중심</h3>
+          <p class="small">결과 숫자와 함께 실제 생활에서의 해석 방법을 안내합니다.</p>
+        </article>
+        <article class="card">
+          <h3>실무 친화</h3>
+          <p class="small">협상, 이직, 대출, 퇴사 시점 검토 등 실제 시나리오에 맞게 설명합니다.</p>
+        </article>
+      </div>
     </section>
 
     <section id="guide">
@@ -248,5 +251,27 @@
   </footer>
 
   <script src="main.js" type="module"></script>
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const button = document.getElementById("theme-toggle");
+      const saved = localStorage.getItem("theme");
+      const preferredDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const initial = saved || (preferredDark ? "dark" : "light");
+
+      function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        button.textContent = theme === "dark" ? "화이트모드" : "다크모드";
+      }
+
+      applyTheme(initial);
+
+      button.addEventListener("click", function () {
+        const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        localStorage.setItem("theme", next);
+        applyTheme(next);
+      });
+    })();
+  </script>
 </body>
 </html>
