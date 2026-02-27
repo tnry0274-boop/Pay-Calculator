@@ -228,8 +228,274 @@ class LoanInterestCalculator extends HTMLElement {
     }
 }
 
+class SalaryRaiseSimulator extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                h2 { color: #7c3aed; }
+                .form-group { margin-bottom: 1rem; }
+                label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+                input { width: 100%; box-sizing: border-box; padding: 0.55rem; border: 1px solid #ccc; border-radius: 4px; }
+                button { background-color: #7c3aed; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
+                #result { margin-top: 1rem; line-height: 1.55; }
+                .money { font-weight: 700; }
+                .small { color: #64748b; font-size: 0.9rem; margin-top: 0.75rem; }
+            </style>
+            <div>
+                <h2>연봉 인상 시뮬레이션</h2>
+                <div class="form-group">
+                    <label for="current-annual">현재 연봉 (원)</label>
+                    <input type="number" id="current-annual" placeholder="40000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="raise-rate">인상률 (%)</label>
+                    <input type="number" id="raise-rate" placeholder="5" min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="effective-tax-rate">예상 실효 공제율 (%)</label>
+                    <input type="number" id="effective-tax-rate" placeholder="12" min="0" max="50" step="0.1" value="12">
+                </div>
+                <button>시뮬레이션</button>
+                <div id="result"></div>
+                <p class="small">안내: 실효 공제율은 세금·보험 등 전체 공제를 단순화한 추정값입니다.</p>
+            </div>
+        `;
+        this.shadowRoot.querySelector('button').addEventListener('click', () => this.calculate());
+    }
+
+    formatWon(amount) {
+        return `${Math.round(amount).toLocaleString()}원`;
+    }
+
+    calculate() {
+        const currentAnnual = parseFloat(this.shadowRoot.querySelector('#current-annual').value);
+        const raiseRate = parseFloat(this.shadowRoot.querySelector('#raise-rate').value);
+        const effectiveTaxRate = parseFloat(this.shadowRoot.querySelector('#effective-tax-rate').value) || 0;
+        const resultEl = this.shadowRoot.querySelector('#result');
+
+        if (!currentAnnual || raiseRate < 0) {
+            resultEl.textContent = '현재 연봉과 인상률을 입력하세요.';
+            return;
+        }
+
+        const newAnnual = currentAnnual * (1 + raiseRate / 100);
+        const annualIncrease = newAnnual - currentAnnual;
+        const monthlyIncrease = annualIncrease / 12;
+        const netCurrentAnnual = currentAnnual * (1 - effectiveTaxRate / 100);
+        const netNewAnnual = newAnnual * (1 - effectiveTaxRate / 100);
+        const netAnnualIncrease = netNewAnnual - netCurrentAnnual;
+
+        resultEl.innerHTML = `
+            <div class="money">인상 전 연봉: ${this.formatWon(currentAnnual)}</div>
+            <div class="money">인상 후 연봉: ${this.formatWon(newAnnual)}</div>
+            <div class="money">연봉 증가액(세전): ${this.formatWon(annualIncrease)}</div>
+            <div class="money">월 증가액(세전): ${this.formatWon(monthlyIncrease)}</div>
+            <div class="money">연 증가액(세후 추정): ${this.formatWon(netAnnualIncrease)}</div>
+        `;
+    }
+}
+
+class LoanRepaymentCalculator extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                h2 { color: #0f766e; }
+                .form-group { margin-bottom: 1rem; }
+                label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+                input, select { width: 100%; box-sizing: border-box; padding: 0.55rem; border: 1px solid #ccc; border-radius: 4px; }
+                button { background-color: #0f766e; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
+                #result { margin-top: 1rem; line-height: 1.55; }
+                .money { font-weight: 700; }
+            </style>
+            <div>
+                <h2>대출 상환 계산기</h2>
+                <div class="form-group">
+                    <label for="loan-principal">대출 원금 (원)</label>
+                    <input type="number" id="loan-principal" placeholder="100000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="loan-rate">연 이자율 (%)</label>
+                    <input type="number" id="loan-rate" placeholder="4.5" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="loan-months">상환 기간 (개월)</label>
+                    <input type="number" id="loan-months" placeholder="360" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="repayment-type">상환 방식</label>
+                    <select id="repayment-type">
+                        <option value="equal-payment">원리금균등</option>
+                        <option value="equal-principal">원금균등</option>
+                    </select>
+                </div>
+                <button>계산</button>
+                <div id="result"></div>
+            </div>
+        `;
+        this.shadowRoot.querySelector('button').addEventListener('click', () => this.calculate());
+    }
+
+    formatWon(amount) {
+        return `${Math.round(amount).toLocaleString()}원`;
+    }
+
+    calculate() {
+        const principal = parseFloat(this.shadowRoot.querySelector('#loan-principal').value);
+        const annualRate = parseFloat(this.shadowRoot.querySelector('#loan-rate').value);
+        const months = parseInt(this.shadowRoot.querySelector('#loan-months').value, 10);
+        const type = this.shadowRoot.querySelector('#repayment-type').value;
+        const resultEl = this.shadowRoot.querySelector('#result');
+
+        if (!principal || annualRate < 0 || !months) {
+            resultEl.textContent = '대출 원금, 이자율, 기간을 입력하세요.';
+            return;
+        }
+
+        const monthlyRate = annualRate / 100 / 12;
+        let firstMonthPayment = 0;
+        let averageMonthlyPayment = 0;
+        let totalInterest = 0;
+        let totalPayment = 0;
+
+        if (type === 'equal-payment') {
+            if (monthlyRate === 0) {
+                firstMonthPayment = principal / months;
+            } else {
+                const pow = Math.pow(1 + monthlyRate, months);
+                firstMonthPayment = principal * monthlyRate * pow / (pow - 1);
+            }
+            totalPayment = firstMonthPayment * months;
+            totalInterest = totalPayment - principal;
+            averageMonthlyPayment = firstMonthPayment;
+        } else {
+            const monthlyPrincipal = principal / months;
+            let remaining = principal;
+            let first = 0;
+            for (let i = 0; i < months; i++) {
+                const interest = remaining * monthlyRate;
+                const payment = monthlyPrincipal + interest;
+                if (i === 0) first = payment;
+                totalPayment += payment;
+                totalInterest += interest;
+                remaining -= monthlyPrincipal;
+            }
+            firstMonthPayment = first;
+            averageMonthlyPayment = totalPayment / months;
+        }
+
+        resultEl.innerHTML = `
+            <div class="money">첫 달 상환액: ${this.formatWon(firstMonthPayment)}</div>
+            <div class="money">월 평균 상환액: ${this.formatWon(averageMonthlyPayment)}</div>
+            <div class="money">총 이자: ${this.formatWon(totalInterest)}</div>
+            <div class="money">총 상환액: ${this.formatWon(totalPayment)}</div>
+        `;
+    }
+}
+
+class TaxSavingTipsAI extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).innerHTML = `
+            <style>
+                h2 { color: #2563eb; }
+                .form-group { margin-bottom: 1rem; }
+                label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+                input { width: 100%; box-sizing: border-box; padding: 0.55rem; border: 1px solid #ccc; border-radius: 4px; }
+                button { background-color: #2563eb; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
+                #result { margin-top: 1rem; line-height: 1.55; }
+                .tip { border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 8px; padding: 10px; margin-top: 8px; }
+                .title { font-weight: 700; margin-bottom: 4px; }
+                .small { color: #64748b; font-size: 0.9rem; margin-top: 0.75rem; }
+            </style>
+            <div>
+                <h2>세금 절약 팁 자동 추천 (AI)</h2>
+                <div class="form-group">
+                    <label for="ai-annual-income">연 소득 (원)</label>
+                    <input type="number" id="ai-annual-income" placeholder="42000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="ai-card-spend">연 카드 사용액 (원)</label>
+                    <input type="number" id="ai-card-spend" placeholder="10000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="ai-pension">연금계좌 납입액 (원)</label>
+                    <input type="number" id="ai-pension" placeholder="2000000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="ai-insurance">보장성 보험료 납입액 (원)</label>
+                    <input type="number" id="ai-insurance" placeholder="800000" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="ai-dependents">부양가족 수</label>
+                    <input type="number" id="ai-dependents" placeholder="1" min="0" step="1">
+                </div>
+                <button>AI 추천 받기</button>
+                <div id="result"></div>
+                <p class="small">안내: AI 추천은 입력값 기반의 절세 패턴 가이드이며 세무 자문을 대체하지 않습니다.</p>
+            </div>
+        `;
+        this.shadowRoot.querySelector('button').addEventListener('click', () => this.recommend());
+    }
+
+    recommend() {
+        const income = parseFloat(this.shadowRoot.querySelector('#ai-annual-income').value);
+        const cardSpend = parseFloat(this.shadowRoot.querySelector('#ai-card-spend').value) || 0;
+        const pension = parseFloat(this.shadowRoot.querySelector('#ai-pension').value) || 0;
+        const insurance = parseFloat(this.shadowRoot.querySelector('#ai-insurance').value) || 0;
+        const dependents = parseInt(this.shadowRoot.querySelector('#ai-dependents').value || '0', 10);
+        const resultEl = this.shadowRoot.querySelector('#result');
+
+        if (!income) {
+            resultEl.textContent = '연 소득을 입력하세요.';
+            return;
+        }
+
+        const tips = [];
+        if (pension < 4000000) {
+            tips.push({
+                title: '연금계좌 세액공제 점검',
+                body: '연금저축/IRP 납입 여력이 있다면 세액공제 한도 활용을 검토하세요.'
+            });
+        }
+        if (cardSpend < income * 0.25) {
+            tips.push({
+                title: '카드 공제 최소 구간 확보',
+                body: '연 소득 대비 카드 사용액이 낮아 공제 효율이 떨어질 수 있습니다. 사용 구조를 점검해 보세요.'
+            });
+        }
+        if (insurance < 1000000) {
+            tips.push({
+                title: '보장성 보험료 공제 확인',
+                body: '보장성 보험료 공제 대상 여부를 확인하고, 누락된 증빙이 없는지 점검하세요.'
+            });
+        }
+        if (dependents === 0) {
+            tips.push({
+                title: '인적공제 대상 재확인',
+                body: '부양가족 요건을 충족하는 가족이 있다면 인적공제 적용 가능성을 확인하세요.'
+            });
+        }
+        tips.push({
+            title: '증빙 자동화',
+            body: '연말정산 전 카드·보험·교육·의료 지출을 월별로 정리하면 누락 공제를 줄일 수 있습니다.'
+        });
+
+        resultEl.innerHTML = tips.slice(0, 4).map((tip, idx) => `
+            <div class="tip">
+                <div class="title">${idx + 1}. ${tip.title}</div>
+                <div>${tip.body}</div>
+            </div>
+        `).join('');
+    }
+}
+
 
 customElements.define('part-time-pay-calculator', PartTimePayCalculator);
+customElements.define('salary-raise-simulator', SalaryRaiseSimulator);
+customElements.define('loan-repayment-calculator', LoanRepaymentCalculator);
+customElements.define('tax-saving-tips-ai', TaxSavingTipsAI);
 customElements.define('after-tax-calculator', AfterTaxCalculator);
 customElements.define('annual-salary-calculator', AnnualSalaryCalculator);
 customElements.define('severance-pay-calculator', SeverancePayCalculator);
